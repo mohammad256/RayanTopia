@@ -1,0 +1,72 @@
+<!-- Frontend (index.html) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Keep your existing styles -->
+    <style>
+        /* Your existing CSS styles */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Generative AI Studio</h1>
+        
+        <div class="api-key">
+            Your API Key: <input type="password" id="apiKey" placeholder="Enter your API key">
+        </div>
+
+        <div class="form-group">
+            <label for="modelSelect">Choose Model</label>
+            <select id="modelSelect">
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                <option value="gemini-2.0-pro">Gemini 2.0 Pro</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="promptInput">Enter your query</label>
+            <textarea id="promptInput" rows="4" placeholder="Type your request here..."></textarea>
+        </div>
+
+        <button onclick="generateContent()">Generate</button>
+
+        <div class="response-box" id="responseBox"></div>
+    </div>
+
+    <script>
+        async function generateContent() {
+            const apiKey = document.getElementById('apiKey').value;
+            const model = document.getElementById('modelSelect').value;
+            const prompt = document.getElementById('promptInput').value;
+            
+            if (!apiKey) {
+                alert('Please enter your API key');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({ model, prompt })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Request failed');
+                }
+
+                document.getElementById('responseBox').textContent = data.content;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('responseBox').textContent = 
+                    `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
